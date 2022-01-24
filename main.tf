@@ -117,7 +117,7 @@ resource "aws_route" "private_nat_gateway" {
 # NAT Gateway #
 ###############
 
-resource "aws_eip" "nateip" {
+resource "aws_eip" "natip" {
   count = var.enable_nat_gateway ? (var.single_nat_gateway ? 1 : length(var.azs)) : 0
 
   vpc = true
@@ -126,7 +126,7 @@ resource "aws_eip" "nateip" {
 resource "aws_nat_gateway" "natgw" {
   count = var.enable_nat_gateway ? (var.single_nat_gateway ? 1 : length(var.azs)) : 0
 
-  allocation_id = element(aws_eip.nateip.*.id, (var.single_nat_gateway ? 0 : count.index))
+  allocation_id = element(aws_eip.natip.*.id, (var.single_nat_gateway ? 0 : count.index))
   subnet_id     = element(aws_subnet.public.*.id, (var.single_nat_gateway ? 0 : count.index))
 
   depends_on = [ aws_internet_gateway.igw ]
