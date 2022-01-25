@@ -1,11 +1,8 @@
-#######################
 # VPC Endpoint for S3 #
-#######################
-
 data "aws_vpc_endpoint_service" "s3" {
   count = var.enable_s3_endpoint ? 1 : 0
 
-  service = "s3"
+  service      = "s3"
   service_type = "Gateway"
 }
 
@@ -31,9 +28,9 @@ resource "aws_vpc_endpoint_route_table_association" "public_s3" {
 }
 
 
-#############################
+
 # VPC Endpoint for DynamoDB #
-#############################
+
 
 data "aws_vpc_endpoint_service" "dynamodb" {
   count = var.enable_dynamodb_endpoint ? 1 : 0
@@ -44,7 +41,7 @@ data "aws_vpc_endpoint_service" "dynamodb" {
 resource "aws_vpc_endpoint" "dynamodb" {
   count = var.enable_dynamodb_endpoint ? 1 : 0
 
-  vpc_id       = aws_vpc.roc.id
+  vpc_id = aws_vpc.roc.id
 
   service_name = data.aws_vpc_endpoint_service.dynamodb[0].service_name
 }
@@ -57,8 +54,8 @@ resource "aws_vpc_endpoint_route_table_association" "private_dynamodb" {
 }
 
 resource "aws_vpc_endpoint_route_table_association" "public_dynamodb" {
-  count =  var.enable_dynamodb_endpoint && length(var.public_subnets) > 0 ? 1 : 0
+  count = var.enable_dynamodb_endpoint && length(var.public_subnets) > 0 ? 1 : 0
 
   vpc_endpoint_id = aws_vpc_endpoint.dynamodb[0].id
-    route_table_id  = element(aws_route_table.public_route.*.id, count.index)
+  route_table_id  = element(aws_route_table.public_route.*.id, count.index)
 }

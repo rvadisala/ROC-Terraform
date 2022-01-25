@@ -1,7 +1,3 @@
-################
-# VPN Gateway #
-###############
-
 resource "aws_vpn_gateway" "vgw" {
   count = var.enable_vpn_gateway ? 1 : 0
 
