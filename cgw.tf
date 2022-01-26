@@ -5,5 +5,5 @@ resource "aws_customer_gateway" "cgw" {
   ip_address = each.value["ip_address"]
   type       = "ipsec.1"
 
-    tags = merge(var.tags, map("Name", format("%s-%s",var.name,each.key)))
+    tags = merge(var.tags, tomap({ "Name" = format("%s-%s",var.name,each.key)}))
 }

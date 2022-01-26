@@ -3,7 +3,7 @@ resource "aws_vpn_gateway" "vgw" {
 
   vpc_id = aws_vpc.roc.id
 
-  tags = merge(var.tags, var.vpn_gateway_tags, map("Name", format("%s", var.name)))
+  tags = merge(var.tags, var.vpn_gateway_tags, tomap({"Name" = format("%s", var.name)}))
 
 }
 

@@ -8,7 +8,7 @@ resource "aws_vpc" "roc" {
   enable_classiclink             = var.enable_classiclink
   enable_classiclink_dns_support = var.enable_classiclink_dns_support
 
-  tags = merge(var.tags, map("Name", format("%s", var.name)))
+  tags = merge(var.tags, tomap({"Name" = format("%s", var.name)}))
 }
 
 # Public subnet
@@ -25,7 +25,7 @@ resource "aws_subnet" "public" {
 
  # ipv6_cidr_block = var.enable_ipv6 && length(var.public_subnet_ipv6_prefixes) > 0 ? cidrsubnet(aws_vpc.roc[0].ipv6_cidr_block, 8, var.public_subnet_ipv6_prefixes[count.index]) : null
 
-  tags = merge(var.tags, var.public_subnet_tags, map("Name", format("%s-subnet-public-%s", var.name, element(var.azs, count.index))))
+  tags = merge(var.tags, var.public_subnet_tags, tomap({"Name"= format("%s-subnet-public-%s", var.name, element(var.azs, count.index))}))
 }
 
 # Private subnet
@@ -42,7 +42,7 @@ resource "aws_subnet" "private" {
 
 #  ipv6_cidr_block = var.enable_ipv6 && length(var.private_subnet_ipv6_prefixes) > 0 ? cidrsubnet(aws_vpc.this[0].ipv6_cidr_block, 8, var.private_subnet_ipv6_prefixes[count.index]) : null
 
-  tags = merge(var.tags, var.private_subnet_tags, map("Name", format("%s-subnet-private-%s", var.name, element(var.azs, count.index))))
+  tags = merge(var.tags, var.private_subnet_tags, tomap({"Name"= format("%s-subnet-private-%s", var.name, element(var.azs, count.index))}))
 }
 
 resource "aws_subnet" "data" {
@@ -56,7 +56,7 @@ resource "aws_subnet" "data" {
 
 #  ipv6_cidr_block = var.enable_ipv6 && length(var.database_subnet_ipv6_prefixes) > 0 ? cidrsubnet(aws_vpc.this[0].ipv6_cidr_block, 8, var.database_subnet_ipv6_prefixes[count.index]) : null
 
-  tags = merge(var.tags, var.data_subnet_tags, map("Name", format("%s-subnet-data-%s", var.name, element(var.azs, count.index))))
+  tags = merge(var.tags, var.data_subnet_tags, tomap({ "Name" = format("%s-subnet-data-%s", var.name, element(var.azs, count.index))}))
 }
 
 # Internet Gateway
@@ -67,7 +67,7 @@ resource "aws_internet_gateway" "igw" {
 
   vpc_id = aws_vpc.roc.id
 
-  tags = merge(var.tags, map("Name", format("%s-igw", var.name)))
+  tags = merge(var.tags, tomap({ "Name" = format("%s-igw", var.name)}))
 }
 
 resource "aws_egress_only_internet_gateway" "egress_igw" {
@@ -87,7 +87,7 @@ resource "aws_route_table" "public_route" {
   depends_on = [aws_internet_gateway.igw]
   # propagating_vgws = ["${var.public_propagating_vgws}"]
 
-  tags = merge(var.tags, map("Name", format("%s-rt-public", var.name)))
+  tags = merge(var.tags, tomap({ "Name" = format("%s-rt-public", var.name)}))
 }
 
 resource "aws_route" "public_internet_gateway" {
@@ -118,7 +118,7 @@ resource "aws_route_table" "private_route" {
 
   vpc_id = aws_vpc.roc.id
 
-  tags = merge(var.tags, map("Name", format("%s-rt-private-%s", var.name, element(var.azs, count.index))))
+  tags = merge(var.tags, tomap({ "Name" = format("%s-rt-private-%s", var.name, element(var.azs, count.index))}))
 
   lifecycle { 
     ignore_changes = [propagating_vgws]
@@ -155,7 +155,7 @@ resource "aws_eip" "natip" {
 
   vpc = true
 
-  tags = merge(var.tags, map("Name", format("%s-%s",var.name, element(var.azs, var.single_nat_gateway ? 0 : count.index))))
+  tags = merge(var.tags, tomap({ "Name" = format("%s-%s",var.name, element(var.azs, var.single_nat_gateway ? 0 : count.index))}))
 }
 
 resource "aws_nat_gateway" "natgw" {
