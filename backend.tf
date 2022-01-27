@@ -7,3 +7,13 @@
 #    dynamodb_table = "terraformlocking"
 #  }
 #}
+
+terraform {
+  cloud {
+    organization = "netenrich"
+
+    workspaces {
+      name = "ne-roc"
+    }
+  }
+}

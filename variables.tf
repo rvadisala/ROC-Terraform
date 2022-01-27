@@ -24,11 +24,6 @@ variable "public_subnet_tags" {
   default     = {}
 }
 
-variable "enable_ipv6" {
-  description = "IPV6 support"
-  default = false
-}
-
 variable "private_subnets" {
   type        = list(any)
   description = "A list of private subnets inside the VPC."
@@ -76,13 +71,10 @@ variable "enable_dns_hostnames" {
 
 variable "enable_dns_support" {
   description = "should be true if you want to use private DNS within the VPC"
-  default     = false
+  default     = true
 }
 
-variable "assign_generated_ipv6_cidr_block" {
-  description = "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block"
-  default     = false
-}
+
 
 variable "enable_classiclink" {
   description = "should be true if you want to use ClassicLink within the VPC"
@@ -115,7 +107,7 @@ variable "single_nat_gateway" {
 
 variable "enable_vpn_gateway" {
   description = "Should be true if you want to create a new VPN Gateway resource and attach it to the VPC"
-  default     = true
+  default     = false
 }
 
 variable "vpn_gateway_tags" {
@@ -150,7 +142,7 @@ variable "enable_s3_endpoint" {
 
 variable "enable_dynamodb_endpoint" {
   description = "should be true if you want to provision an DynamoDB endpoint to the VPC"
-  default     = true
+  default     = false
 }
 
 
@@ -467,4 +459,99 @@ variable "vpc_flow_log_permissions_boundary" {
   description = "The ARN of the Permissions Boundary for the VPC Flow Log IAM Role"
   type        = string
   default     = null
+}
+
+variable "default_security_group" {
+  description = "Should be true to adopt and manage default security group"
+  type        = bool
+  default     = false
+}
+
+variable "default_security_group_ingress" {
+  description = "List of maps of ingress rules to set on the default security group"
+  type        = list(map(string))
+  default     = []
+}
+
+variable "default_security_group_egress" {
+  description = "List of maps of egress rules to set on the default security group"
+  type        = list(map(string))
+  default     = []
+}
+
+variable "default_security_group_tags" {
+  description = "Additional tags for the default security group"
+  type        = map(string)
+  default     = {}
+}
+
+variable "default_security_group_name" {
+  description = "Name to be used on the default security group"
+  type        = string
+  default     = null
+}
+
+
+# IPV6 Settings
+###############
+
+
+variable "enable_ipv6" {
+  description = "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block."
+  type        = bool
+  default     = true
+}
+
+variable "assign_generated_ipv6_cidr_block" {
+  description = "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC. You cannot specify the range of IP addresses, or the size of the CIDR block"
+  default     = true
+}
+
+variable "public_subnet_ipv6_prefixes" {
+  description = "Assigns IPv6 public subnet id based on the Amazon provided /56 prefix base 10 integer (0-256). Must be of equal length to the corresponding IPv4 subnet list"
+  type        = list(any)
+  default     = [0,1,2]
+}
+
+variable "private_subnet_ipv6_prefixes" {
+  description = "Assigns IPv6 private subnet id based on the Amazon provided /56 prefix base 10 integer (0-256). Must be of equal length to the corresponding IPv4 subnet list"
+  type        = list(any)
+  default     = [3,4,5]
+}
+
+variable "data_subnet_ipv6_prefixes" {
+  description = "Assigns IPv6 database subnet id based on the Amazon provided /56 prefix base 10 integer (0-256). Must be of equal length to the corresponding IPv4 subnet list"
+  type        = list(any)
+  default     = [6,7,8]
+}
+
+
+variable "assign_ipv6_address_on_creation" {
+  description = "Assign IPv6 address on subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map_public_ip_on_launch"
+  type        = bool
+  default     = true
+}
+
+variable "private_subnet_assign_ipv6_address_on_creation" {
+  description = "Assign IPv6 address on private subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map_public_ip_on_launch"
+  type        = bool
+  default     = false
+}
+
+variable "public_subnet_assign_ipv6_address_on_creation" {
+  description = "Assign IPv6 address on public subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map_public_ip_on_launch"
+  type        = bool
+  default     = null
+}
+
+variable "data_subnet_assign_ipv6_address_on_creation" {
+  description = "Assign IPv6 address on database subnet, must be disabled to change IPv6 CIDRs. This is the IPv6 equivalent of map_public_ip_on_launch"
+  type        = bool
+  default     = null
+}
+
+variable "ipv6_public_subnet_netnum_offset" {
+  description = "By default public IPv6 subnets is allocated from start of VPC IPv6 CIDR block. This can be used to force an offset, i.e. if adding public subnets when private ones already exists (which would be at beginning of block)."
+  type        = number
+  default     = 0
 }
