@@ -464,20 +464,21 @@ variable "vpc_flow_log_permissions_boundary" {
 variable "default_security_group" {
   description = "Should be true to adopt and manage default security group"
   type        = bool
-  default     = false
+  default     = true
 }
 
-variable "default_security_group_ingress" {
-  description = "List of maps of ingress rules to set on the default security group"
-  type        = list(map(string))
-  default     = []
-}
+variable "default_security_group_description" {
+  description = "Description of Security Group"
+  type        = string
+  default     = "Managed by Terraform"
 
-variable "default_security_group_egress" {
-  description = "List of maps of egress rules to set on the default security group"
-  type        = list(map(string))
-  default     = []
 }
+#
+# variable "default_security_group_egress" {
+#  description = "List of maps of egress rules to set on the default security group"
+#  type        = list(map(string))
+#  default     = []
+# }
 
 variable "default_security_group_tags" {
   description = "Additional tags for the default security group"
@@ -554,4 +555,61 @@ variable "ipv6_public_subnet_netnum_offset" {
   description = "By default public IPv6 subnets is allocated from start of VPC IPv6 CIDR block. This can be used to force an offset, i.e. if adding public subnets when private ones already exists (which would be at beginning of block)."
   type        = number
   default     = 0
+}
+
+##################################################
+
+
+variable "default_security_group_ingress" {
+  description = "List of maps of ingress rules to set on the default security group"
+  type        = list(map(string))
+  default = [
+    {
+      cidr_blocks = "10.0.0.0/16"
+      description = "Allow all from the local network."
+      from_port   = 0
+      protocol    = "-1"
+      self        = false
+      to_port     = 0
+    },
+    {
+      cidr_blocks = "0.0.0.0/0"
+      description = "Allow all HTTPS from the internet."
+      from_port   = 443
+      protocol    = "6"
+      self        = false
+      to_port     = 443
+    },
+    {
+      cidr_blocks = "0.0.0.0/0"
+      description = "Allow all HTTP from the internet."
+      from_port   = 80
+      protocol    = "6"
+      self        = false
+      to_port     = 80
+    },
+    {
+      cidr_blocks = "0.0.0.0/0"
+      description = "Allow all ephemeral ports from the internet."
+      from_port   = 32768
+      protocol    = "6"
+      self        = false
+      to_port     = 60999
+    }
+  ]
+}
+
+variable "default_security_group_egress" {
+  description = "List of maps of egress rules to set on the default security group"
+  type        = list(map(string))
+  default = [
+    {
+      cidr_blocks = "0.0.0.0/0"
+      description = "Allow all"
+      from_port   = 0
+      protocol    = "-1"
+      self        = false
+      to_port     = 0
+    }
+  ]
 }
